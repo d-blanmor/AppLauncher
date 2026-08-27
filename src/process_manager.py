@@ -71,6 +71,79 @@ class ProcessManager:
         return command
 
     @staticmethod
+    def get_service_name(app: dict[str, Any]) -> str:
+        return str(app.get("service_name") or "").strip()
+
+    @staticmethod
+    def get_port_host(app: dict[str, Any]) -> str:
+        return str(app.get("port_host") or "localhost").strip() or "localhost"
+
+    @staticmethod
+    def get_port_number(app: dict[str, Any]) -> int:
+        try:
+            return int(app.get("port_number") or "0")
+        except (TypeError, ValueError):
+            return 0
+
+    @staticmethod
+    def is_port_reachable(app: dict[str, Any]) -> bool:
+        host = ProcessManager.get_port_host(app)
+        port = ProcessManager.get_port_number(app)
+        if not host or port <= 0:
+            return False
+        try:
+            import socket
+            with socket.create_connection((host, port), timeout=2):
+                return True
+        except OSError:
+            return False
+
+    @staticmethod
+    def is_service_running(app: dict[str, Any]) -> bool:
+        service_name = ProcessManager.get_service_name(app)
+        if not service_name:
+            return False
+        result = subprocess.run(["sc", "query", service_name], capture_output=True, text=True, shell=False)
+        output = (result.stdout or "") + (result.stderr or "")
+        return "RUNNING" in output.upper()
+
+    @staticmethod
+    def start_service(app: dict[str, Any]) -> bool:
+        service_name = ProcessManager.get_service_name(app)
+        if not service_name:
+            return False
+
+        log_path = ProcessManager.get_log_path(app)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(log_path, "a", encoding="utf-8") as log_file:
+            log_file.write(f"\n--- Starting service: {service_name} ---\n")
+
+        result = subprocess.run(["sc", "start", service_name], capture_output=True, text=True, shell=False)
+        output = (result.stdout or "") + (result.stderr or "")
+        if output:
+            with open(log_path, "a", encoding="utf-8") as log_file:
+                log_file.write(output)
+        return result.returncode == 0 or "STARTED" in output.upper() or ProcessManager.is_service_running(app)
+
+    @staticmethod
+    def stop_service(app: dict[str, Any]) -> bool:
+        service_name = ProcessManager.get_service_name(app)
+        if not service_name:
+            return False
+
+        log_path = ProcessManager.get_log_path(app)
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(log_path, "a", encoding="utf-8") as log_file:
+            log_file.write(f"\n--- Stopping service: {service_name} ---\n")
+
+        result = subprocess.run(["sc", "stop", service_name], capture_output=True, text=True, shell=False)
+        output = (result.stdout or "") + (result.stderr or "")
+        if output:
+            with open(log_path, "a", encoding="utf-8") as log_file:
+                log_file.write(output)
+        return result.returncode == 0 or "STOPPED" in output.upper() or not ProcessManager.is_service_running(app)
+
+    @staticmethod
     def start_process(app: dict[str, Any]) -> subprocess.Popen[str] | None:
         command = ProcessManager.build_command(app)
         if not command:

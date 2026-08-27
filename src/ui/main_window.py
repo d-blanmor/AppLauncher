@@ -22,6 +22,7 @@ class MainWindow:
         self.root.title("App Launcher")
         self.root.geometry("980x680")
         self.root.minsize(760, 420)
+        self.root.resizable(False, False)
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
         toolbar = ttk.Frame(self.root, padding=(12, 10, 12, 6))
@@ -47,6 +48,8 @@ class MainWindow:
         self.launcher_container = ttk.Frame(self.launcher_canvas)
         self.launcher_container_id = self.launcher_canvas.create_window((0, 0), window=self.launcher_container, anchor="nw")
         self.launcher_container.bind("<Configure>", self._on_launcher_configure)
+        for idx in range(3):
+            self.launcher_container.grid_columnconfigure(idx, weight=1)
 
         self.logs_canvas = tk.Canvas(self.logs_frame, highlightthickness=0)
         self.logs_scrollbar = ttk.Scrollbar(self.logs_frame, orient="vertical", command=self.logs_canvas.yview)
@@ -165,12 +168,14 @@ class MainWindow:
         apps = self.app_manager.get_apps()
         if not apps:
             empty_launcher = ttk.Label(self.launcher_container, text="No apps configured yet.", foreground="#555555")
-            empty_launcher.pack(expand=True)
+            empty_launcher.grid(row=0, column=0, sticky="nsew", padx=12, pady=12)
 
             empty_logs = ttk.Label(self.logs_container, text="No logs available yet.", foreground="#555555")
             empty_logs.pack(expand=True)
             return
 
+        current_row = 0
+        current_col = 0
         for app in apps:
             card = AppCard(
                 self.launcher_container,
@@ -179,10 +184,21 @@ class MainWindow:
                 on_stop=self._on_stop_app,
                 on_setup=self._on_setup_app,
             )
-            card.pack(fill="x", pady=6)
+            width_units = card.card_width_units()
+            if current_col + width_units > 3:
+                current_row += 1
+                current_col = 0
+            card.grid(row=current_row, column=current_col, columnspan=width_units, sticky="ew", padx=(0, 8), pady=6)
+            self.launcher_container.grid_columnconfigure(current_col, weight=1)
+            if width_units > 1:
+                self.launcher_container.grid_columnconfigure(current_col + 1, weight=1)
+            current_col += width_units
+            if current_col >= 3:
+                current_row += 1
+                current_col = 0
 
             log_card = LogCard(self.logs_container, app)
-            log_card.pack(fill="x", pady=6)
+            log_card.pack(fill="both", expand=True, pady=6)
 
     def _on_open_settings(self):
         dialog = SettingsDialog(self.root, self.app_manager.get_settings())

@@ -9,6 +9,8 @@ A simple Windows desktop launcher for Python, Node.js, and batch-based applicati
 - Process logs written to the `logs/` folder
 - Optional tray icon support for minimize-to-tray behavior
 - Configurable close behavior: minimize to tray or close the app and running child processes
+- Per-app launcher card sizing (`small`, `medium`, `big`) controlling both width and height in the launcher tab
+- Per-app execution mode: run a normal command or control a Windows service by name
 
 ## Run
 From the project root:
@@ -16,6 +18,19 @@ From the project root:
 ```powershell
 .\.venv\Scripts\python.exe -m src.main
 ```
+
+## Test
+
+Source compilation passed with the project venv:
+
+```powershell
+..venv\Scripts\python.exe -m compileall src
+```
+
+Config and app manager smoke test passed:
+
+app manager loaded app data and settings successfully
+
 
 ## Generate an EXE
 Install PyInstaller in the virtual environment:
@@ -67,8 +82,15 @@ Example structure:
       "args": ["--port", "3000"],
       "working_directory": "C:\\Projects\\MyApp",
       "enabled": true,
-      "status": "stopped"
+      "status": "stopped",
+      "output_mode": "both",
+      "mode": "service",
+      "service_name": "MyWindowsService",
+      "card_size": "medium"
     }
-  ]
+  ],
+  "settings": {
+    "close_behavior": "tray"
+  }
 }
 ```
