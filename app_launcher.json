@@ -1,0 +1,133 @@
+{
+  "apps": [
+    {
+      "id": "log-demo",
+      "name": "Log Demo",
+      "description": "Testing logs",
+      "type": "python",
+      "path": "-c",
+      "args": [
+        "print('hello stdout')"
+      ],
+      "working_directory": "D:\\workbench\\AppLauncher",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "file",
+      "last_log": "D:\\workbench\\AppLauncher\\logs\\Log_Demo.log"
+    },
+    {
+      "id": "demo",
+      "name": "Demo",
+      "description": "Demo card",
+      "type": "python",
+      "path": "-c",
+      "args": [
+        "print('demo')"
+      ],
+      "working_directory": "",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "file",
+      "last_log": ""
+    },
+    {
+      "id": "demo",
+      "name": "Demo",
+      "description": "Demo card",
+      "type": "python",
+      "path": "-c",
+      "args": [
+        "print('demo')"
+      ],
+      "working_directory": "",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "file",
+      "last_log": ""
+    },
+    {
+      "id": "demo",
+      "name": "Demo",
+      "description": "Demo card",
+      "type": "python",
+      "path": "-c",
+      "args": [
+        "print('demo')"
+      ],
+      "working_directory": "",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "file",
+      "last_log": ""
+    },
+    {
+      "id": "demo",
+      "name": "Demo",
+      "description": "Demo card",
+      "type": "python",
+      "path": "-c",
+      "args": [
+        "print('demo')"
+      ],
+      "working_directory": "",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "file",
+      "last_log": ""
+    },
+    {
+      "id": "04ab7a11",
+      "name": "New App",
+      "description": "",
+      "type": "python",
+      "path": "",
+      "args": [],
+      "working_directory": "",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "both",
+      "last_log": ""
+    },
+    {
+      "id": "demo",
+      "name": "Demo",
+      "description": "Demo card",
+      "type": "python",
+      "path": "-c",
+      "args": [
+        "print('demo')"
+      ],
+      "working_directory": "",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "file",
+      "last_log": ""
+    },
+    {
+      "id": "demo",
+      "name": "Demo",
+      "description": "Demo card",
+      "type": "python",
+      "path": "-c",
+      "args": [
+        "print('demo')"
+      ],
+      "working_directory": "",
+      "enabled": true,
+      "status": "stopped",
+      "pid": null,
+      "output_mode": "file",
+      "last_log": ""
+    }
+  ],
+  "settings": {
+    "close_behavior": "close_children"
+  }
+}
