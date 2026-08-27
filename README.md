@@ -9,7 +9,7 @@ A simple Windows desktop launcher for Python, Node.js, and batch-based applicati
 - Process logs written to the `logs/` folder
 - Optional tray icon support for minimize-to-tray behavior
 - Configurable close behavior: minimize to tray or close the app and running child processes
-- Per-app launcher card sizing (`small`, `medium`, `big`) controlling both width and height in the launcher tab
+- Per-app launcher card sizing (`1x1`, `1x2`, `1x3`, `2x1`, `2x2`, `2x3`, `3x1`, `3x2`, `3x3`) controlling both width and height in the launcher tab
 - Per-app execution mode: run a normal command or control a Windows service by name
 
 ## Run

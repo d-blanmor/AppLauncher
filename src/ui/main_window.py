@@ -198,7 +198,7 @@ class MainWindow:
                 current_col = 0
 
             log_card = LogCard(self.logs_container, app)
-            log_card.pack(fill="both", expand=True, pady=6)
+            log_card.pack(fill="x", expand=True, pady=6)
 
     def _on_open_settings(self):
         dialog = SettingsDialog(self.root, self.app_manager.get_settings())

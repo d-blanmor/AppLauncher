@@ -127,9 +127,9 @@ class AppManager:
 
     @staticmethod
     def normalize_card_size(value: Any) -> str:
-        normalized = str(value or "big").strip().lower()
-        if normalized not in {"small", "medium", "big"}:
-            return "big"
+        normalized = str(value or "1x1").strip().lower()
+        if normalized not in {"1x1", "1x2", "1x3", "2x1", "2x2", "2x3", "3x1", "3x2", "3x3"}:
+            return "1x1"
         return normalized
 
     @staticmethod

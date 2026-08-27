@@ -28,7 +28,7 @@ class AppDialog(tk.Toplevel):
         self.service_name_var = tk.StringVar(value=str(self.original_app.get("service_name") or ""))
         self.port_host_var = tk.StringVar(value=str(self.original_app.get("port_host") or "localhost"))
         self.port_number_var = tk.StringVar(value=str(self.original_app.get("port_number") or ""))
-        self.card_size_var = tk.StringVar(value=str(self.original_app.get("card_size") or "big").lower())
+        self.card_size_var = tk.StringVar(value=str(self.original_app.get("card_size") or "1x1").lower())
 
         form = ttk.Frame(self, padding=16)
         form.pack(fill="both", expand=True)
@@ -85,7 +85,7 @@ class AppDialog(tk.Toplevel):
         self.test_port_button.grid(row=10, column=2, sticky="w", padx=(8, 0), pady=(0, 8))
 
         ttk.Label(form, text="Card Size").grid(row=11, column=0, sticky="w", pady=(0, 8))
-        ttk.Combobox(form, textvariable=self.card_size_var, values=["small", "medium", "big"], state="readonly", width=46).grid(row=11, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        ttk.Combobox(form, textvariable=self.card_size_var, values=["1x1", "1x2", "1x3", "2x1", "2x2", "2x3", "3x1", "3x2", "3x3"], state="readonly", width=46).grid(row=11, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
 
         ttk.Checkbutton(form, text="Enabled", variable=self.enabled_var).grid(row=12, column=1, sticky="w", padx=(12, 0), pady=(0, 12))
 
