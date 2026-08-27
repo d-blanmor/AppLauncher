@@ -33,23 +33,43 @@ app manager loaded app data and settings successfully
 
 
 ## Generate an EXE
-Install PyInstaller in the virtual environment:
+For best portability, build the package from a clean Python environment that is not tied to Anaconda's base installation. The EXE bundles the runtime and libraries from that build environment, but it still needs a compatible Windows runtime and the Tk/Tcl DLL chain that was available when it was built.
+
+Recommended approach:
+
+1. Install a standard Python 3.12/3.13 from python.org and create a clean venv (do not rely on Anaconda base for packaging):
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install pyinstaller
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --upgrade pip
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt pyinstaller
 ```
 
-Build the executable from the project root:
+If you must use Anaconda, prefer a dedicated Conda environment created explicitly for this app, not the base environment, and make sure `tk` is installed there:
+
+```powershell
+conda create -n applauncher python=3.13 tk -y
+conda activate applauncher
+python -m pip install -r requirements.txt pyinstaller
+```
+
+2. Build the executable from the project root:
 
 ```powershell
 .\.venv\Scripts\pyinstaller --onefile --windowed --name AppLauncher .\src\main.py
 ```
 
-This creates a standalone executable in the `dist` folder. After build, you can run:
+3. Run the generated package:
 
 ```powershell
 .\dist\AppLauncher.exe
 ```
+
+Notes:
+- The app is portable across Windows systems that match the same architecture (for example x64 Windows 10/11) when the bundled runtime is used.
+- It is not truly independent from the Windows OS: Microsoft runtime libraries and the Tk/Tcl DLL chain still need to be compatible.
+- If you build from a system Python or from Anaconda, the resulting EXE can fail to start with `ImportError: DLL load failed while importing _tkinter` because Tk is not available in the same way as it is in a clean venv.
+- If you need more control, use a dedicated build venv and avoid mixing with Conda unless you specifically installed a Tk-enabled Python there.
 
 ## Log handling
 The main window has two tabs:

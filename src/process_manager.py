@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +30,10 @@ class ProcessManager:
 
     @staticmethod
     def get_log_path(app: dict[str, Any]) -> Path:
-        root = Path(__file__).resolve().parents[1]
+        if getattr(sys, "frozen", False):
+            root = Path(sys.executable).resolve().parent
+        else:
+            root = Path(__file__).resolve().parents[1]
         logs_dir = root / "logs"
         logs_dir.mkdir(parents=True, exist_ok=True)
         safe_name = "".join(ch if ch.isalnum() or ch in ("-", "_") else "_" for ch in app.get("name", "app"))
