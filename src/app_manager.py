@@ -11,12 +11,17 @@ from .process_manager import ProcessManager
 class AppManager:
     def __init__(self, config_path: str | None = None):
         self.config_store = ConfigStore(config_path)
-        self.apps: list[dict[str, Any]] = self.config_store.load_apps()
-        self.settings: dict[str, Any] = self.config_store.load_settings()
+        payload = self.config_store.load_payload()
+        self.title = str(payload.get("title") or "App Launcher").strip() or "App Launcher"
+        self.apps: list[dict[str, Any]] = payload.get("apps", [])
+        self.settings: dict[str, Any] = payload.get("settings", {"close_behavior": "tray"})
         self.running_processes: dict[str, subprocess.Popen[str]] = {}
 
     def _save(self) -> None:
         self.config_store.save_apps(self.apps)
+
+    def get_title(self) -> str:
+        return str(self.title or "App Launcher").strip() or "App Launcher"
 
     def get_settings(self) -> dict[str, Any]:
         return self.settings

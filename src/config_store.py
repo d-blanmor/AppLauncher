@@ -18,16 +18,16 @@ class ConfigStore:
         self.path = base_path if base_path.suffix.lower() == ".json" else base_path / "app_launcher.json"
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if not self.path.exists():
-            self.save_payload({"apps": [], "settings": {"close_behavior": "tray"}})
+            self.save_payload({"title": "App Launcher", "apps": [], "settings": {"close_behavior": "tray"}})
 
     def load_payload(self) -> dict[str, Any]:
         try:
             raw = json.loads(self.path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, FileNotFoundError):
-            return {"apps": [], "settings": {"close_behavior": "tray"}}
+            return {"title": "App Launcher", "apps": [], "settings": {"close_behavior": "tray"}}
 
         if not isinstance(raw, dict):
-            return {"apps": [], "settings": {"close_behavior": "tray"}}
+            return {"title": "App Launcher", "apps": [], "settings": {"close_behavior": "tray"}}
 
         apps = raw.get("apps", [])
         settings = raw.get("settings", {})
@@ -35,7 +35,8 @@ class ConfigStore:
             settings = {}
 
         settings.setdefault("close_behavior", "tray")
-        return {"apps": apps if isinstance(apps, list) else [], "settings": settings}
+        title = str(raw.get("title") or "App Launcher").strip() or "App Launcher"
+        return {"title": title, "apps": apps if isinstance(apps, list) else [], "settings": settings}
 
     def load_apps(self) -> list[dict[str, Any]]:
         return self.load_payload().get("apps", [])

@@ -19,7 +19,7 @@ class MainWindow:
         self.app_manager = app_manager
         self.tray_icon = None
 
-        self.root.title("App Launcher")
+        self.root.title(self._get_title())
         self.root.geometry("980x680")
         self.root.minsize(760, 420)
         self.root.resizable(False, False)
@@ -67,6 +67,9 @@ class MainWindow:
             self._create_tray_icon()
 
         self.load_apps()
+
+    def _get_title(self) -> str:
+        return self.app_manager.get_title()
 
     def _get_close_behavior(self) -> str:
         return str(self.app_manager.get_settings().get("close_behavior", "tray")).strip().lower()

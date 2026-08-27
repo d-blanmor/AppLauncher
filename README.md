@@ -92,6 +92,7 @@ Example structure:
 
 ```json
 {
+  "title": "App Launcher",
   "apps": [
     {
       "id": "demo-app",

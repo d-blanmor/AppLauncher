@@ -1,4 +1,5 @@
 {
+  "title": "App Launcher",
   "apps": [],
   "settings": {
     "close_behavior": "close_children"
