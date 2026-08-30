@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -21,8 +22,28 @@ class ProcessManager:
         return "\n".join(lines) if lines else "No log output yet."
 
     @staticmethod
-    def determine_python_executable() -> str:
-        return shutil.which("python") or shutil.which("py") or "python"
+    def determine_python_executable(app_type: str, base_dir: str, v_env: str) -> str:
+        if (base_dir != '' ) and (v_env != ''):
+            rx = re.compile(".*\\$")
+            if not rx.match(base_dir):
+                base_dir = base_dir + "\\"
+            if not rx.match(v_env):
+                v_env = v_env + "\\"
+            root = base_dir + v_env + "Scripts\\"
+
+        elif (base_dir != '' ):
+            root = base_dir
+        else:
+            root = ""
+
+        if app_type == "uvicorn (python)":
+            return shutil.which(root + "uvicorn")
+        else:
+            return shutil.which(root + "python") or shutil.which(root + "py") or root + "python"
+
+    @staticmethod
+    def determine_uvicorn_executable(base_dir: str) -> str:
+        return shutil.which("uvicorn") or "uvicorn"
 
     @staticmethod
     def determine_node_executable() -> str:
@@ -42,35 +63,45 @@ class ProcessManager:
     @staticmethod
     def build_command(app: dict[str, Any]) -> list[str]:
         app_type = str(app.get("type", "python")).lower()
-        path_value = str(app.get("path", "")).strip()
+        dir_value = str(app.get("working_directory")).lower()
+        v_env_value = str(app.get("venv")).lower()
+        program_value = str(app.get("program", "")).strip()
         args = [str(arg) for arg in app.get("args", [])]
 
         if app_type == "python":
-            executable = ProcessManager.determine_python_executable()
+            executable = ProcessManager.determine_python_executable(app_type = app_type, base_dir = dir_value, v_env = v_env_value)
             command = [executable]
-            if path_value:
-                command.append(path_value)
+            if program_value != "":
+                command.extend([program_value])
+            command.extend(args)
+            return command
+
+        if app_type == "uvicorn (python)":
+            executable = ProcessManager.determine_python_executable(app_type = app_type, base_dir = dir_value, v_env = v_env_value)
+            command = [executable]
+            if program_value != "":
+                command.extend([program_value])
             command.extend(args)
             return command
 
         if app_type == "node":
             executable = ProcessManager.determine_node_executable()
             command = [executable]
-            if path_value:
-                command.append(path_value)
+            if program_value:
+                command.append(program_value)
             command.extend(args)
             return command
 
-        if app_type == "batch":
+        if app_type == "executable":
             command = ["cmd.exe", "/c"]
-            if path_value:
-                command.append(path_value)
+            if program_value:
+                command.append(program_value)
             command.extend(args)
             return command
 
         command = []
-        if path_value:
-            command.append(path_value)
+        if program_value:
+            command.append(program_value)
         command.extend(args)
         return command
 
@@ -153,7 +184,7 @@ class ProcessManager:
         if not command:
             return None
 
-        working_dir = app.get("working_directory") or os.path.dirname(app.get("path")) or None
+        working_dir = app.get("working_directory") or os.path.dirname(app.get("program")) or None
         log_path = ProcessManager.get_log_path(app)
         output_mode = str(app.get("output_mode") or "both").lower()
 

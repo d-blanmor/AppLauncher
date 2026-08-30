@@ -1,6 +1,6 @@
 # AppLauncher
 
-A simple Windows desktop launcher for Python, Node.js, and batch-based applications.
+A simple Windows desktop launcher for Python, Uvicorn (Python), Node.js, and executable applications (command, exe, batch files).
 
 ## Features
 - Card-based dashboard for each configured app
@@ -99,7 +99,7 @@ Example structure:
       "name": "Demo App",
       "description": "Example Python app",
       "type": "python",
-      "path": "script.py",
+      "program": "script.py",
       "args": ["--port", "3000"],
       "working_directory": "C:\\Projects\\MyApp",
       "enabled": true,

@@ -135,24 +135,65 @@ class MainWindow:
         except Exception:
             callback()
 
-    def show_window(self):
-        self._schedule_ui(self._show_window_impl)
-
     def _show_window_impl(self):
         if self.root.winfo_exists():
             self.root.deiconify()
             self.root.state("normal")
             self.root.focus_force()
 
+    def _hide_to_tray_impl(self):
+        if self.root.winfo_exists():
+            self.root.withdraw()
+
+    def _on_open_settings(self):
+        dialog = SettingsDialog(self.root, self.app_manager.get_settings())
+        if dialog.result is not None:
+            self.app_manager.save_settings(dialog.result)
+            self._apply_close_behavior()
+
+    def _on_add_app(self):
+        dialog = AppDialog(self.root)
+        if dialog.result is not None:
+            self.app_manager.add_app(dialog.result)
+            self.load_apps()
+
+    def _on_setup_app(self, app_id: str):
+        app = self._find_app(app_id)
+        if app is None:
+            return
+        dialog = AppDialog(self.root, app)
+        if dialog.result is not None:
+            self.app_manager.update_app(app_id, dialog.result)
+            self.load_apps()
+
+    def _on_start_app(self, app_id: str):
+        try:
+            self.app_manager.start_app(app_id)
+        except ValueError:
+            messagebox.showwarning("App not found", "The selected app could not be found.")
+        self.load_apps()
+
+    def _on_stop_app(self, app_id: str):
+        try:
+            self.app_manager.stop_app(app_id)
+        except ValueError:
+            messagebox.showwarning("App not found", "The selected app could not be found.")
+        self.load_apps()
+
+    def _find_app(self, app_id: str):
+        for app in self.app_manager.get_apps():
+            if app.get("id") == app_id:
+                return app
+        return None
+
+    def show_window(self):
+        self._schedule_ui(self._show_window_impl)
+
     def hide_to_tray(self):
         if self.tray_icon is not None:
             self._schedule_ui(self._hide_to_tray_impl)
             return
         self._schedule_ui(self.root.destroy)
-
-    def _hide_to_tray_impl(self):
-        if self.root.winfo_exists():
-            self.root.withdraw()
 
     def exit_app(self):
         try:
@@ -203,43 +244,3 @@ class MainWindow:
             log_card = LogCard(self.logs_container, app)
             log_card.pack(fill="x", expand=True, pady=6)
 
-    def _on_open_settings(self):
-        dialog = SettingsDialog(self.root, self.app_manager.get_settings())
-        if dialog.result is not None:
-            self.app_manager.save_settings(dialog.result)
-            self._apply_close_behavior()
-
-    def _on_add_app(self):
-        dialog = AppDialog(self.root)
-        if dialog.result is not None:
-            self.app_manager.add_app(dialog.result)
-            self.load_apps()
-
-    def _on_setup_app(self, app_id: str):
-        app = self._find_app(app_id)
-        if app is None:
-            return
-        dialog = AppDialog(self.root, app)
-        if dialog.result is not None:
-            self.app_manager.update_app(app_id, dialog.result)
-            self.load_apps()
-
-    def _on_start_app(self, app_id: str):
-        try:
-            self.app_manager.start_app(app_id)
-        except ValueError:
-            messagebox.showwarning("App not found", "The selected app could not be found.")
-        self.load_apps()
-
-    def _on_stop_app(self, app_id: str):
-        try:
-            self.app_manager.stop_app(app_id)
-        except ValueError:
-            messagebox.showwarning("App not found", "The selected app could not be found.")
-        self.load_apps()
-
-    def _find_app(self, app_id: str):
-        for app in self.app_manager.get_apps():
-            if app.get("id") == app_id:
-                return app
-        return None

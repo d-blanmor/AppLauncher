@@ -17,18 +17,26 @@ class AppDialog(tk.Toplevel):
 
         self.name_var = tk.StringVar(value=self.original_app.get("name", ""))
         self.description_var = tk.StringVar(value=self.original_app.get("description", ""))
-        self.type_var = tk.StringVar(value=str(self.original_app.get("type") or "python").lower())
-        self.path_var = tk.StringVar(value=self.original_app.get("path", ""))
-        args_value = " ".join(str(arg) for arg in self.original_app.get("args", []))
-        self.args_var = tk.StringVar(value=args_value)
-        self.working_directory_var = tk.StringVar(value=self.original_app.get("working_directory", ""))
-        self.enabled_var = tk.BooleanVar(value=bool(self.original_app.get("enabled", True)))
+        self.card_size_var = tk.StringVar(value=str(self.original_app.get("card_size") or "1x1").lower())
         self.output_mode_var = tk.StringVar(value=str(self.original_app.get("output_mode") or "both").lower())
         self.mode_var = tk.StringVar(value=str(self.original_app.get("mode") or "application").lower())
+
+        # mode = Application
+        self.type_var = tk.StringVar(value=str(self.original_app.get("type") or "python").lower())
+        self.working_directory_var = tk.StringVar(value=self.original_app.get("working_directory", ""))
+        self.virtual_environment_var = tk.StringVar(value=self.original_app.get("venv", ""))
+        self.program_var = tk.StringVar(value=self.original_app.get("program", ""))
+        args_value = " ".join(str(arg) for arg in self.original_app.get("args", []))
+        self.args_var = tk.StringVar(value=args_value)
+
+        # mode = Service
         self.service_name_var = tk.StringVar(value=str(self.original_app.get("service_name") or ""))
+
+        # mode = port
         self.port_host_var = tk.StringVar(value=str(self.original_app.get("port_host") or "localhost"))
         self.port_number_var = tk.StringVar(value=str(self.original_app.get("port_number") or ""))
-        self.card_size_var = tk.StringVar(value=str(self.original_app.get("card_size") or "1x1").lower())
+
+        self.enabled_var = tk.BooleanVar(value=bool(self.original_app.get("enabled", True)))
 
         form = ttk.Frame(self, padding=16)
         form.pack(fill="both", expand=True)
@@ -39,60 +47,71 @@ class AppDialog(tk.Toplevel):
         ttk.Label(form, text="Description").grid(row=1, column=0, sticky="w", pady=(0, 8))
         ttk.Entry(form, textvariable=self.description_var, width=48).grid(row=1, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
 
+        ttk.Label(form, text="Card Size").grid(row=2, column=0, sticky="w", pady=(0, 8))
+        ttk.Combobox(form, textvariable=self.card_size_var, values=["1x1", "1x2", "1x3", "2x1", "2x2", "2x3", "3x1", "3x2", "3x3"], state="readonly", width=46).grid(row=2, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+
+        ttk.Label(form, text="Log Output").grid(row=3, column=0, sticky="w", pady=(0, 8))
+        ttk.Combobox(form, textvariable=self.output_mode_var, values=["file", "console", "both"], state="readonly", width=46).grid(row=3, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+
+        ttk.Label(form, text="Mode").grid(row=4, column=0, sticky="w", pady=(0, 8))
+        ttk.Combobox(form, textvariable=self.mode_var, values=["application", "service", "port"], state="readonly", width=46).grid(row=4, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+
+        # mode = Application
         self.type_label = ttk.Label(form, text="Type")
-        self.type_label.grid(row=2, column=0, sticky="w", pady=(0, 8))
-        self.type_combo = ttk.Combobox(form, textvariable=self.type_var, values=["python", "node", "batch"], state="readonly", width=46)
-        self.type_combo.grid(row=2, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
-
-        self.path_label = ttk.Label(form, text="Path")
-        self.path_label.grid(row=3, column=0, sticky="w", pady=(0, 8))
-        self.path_entry = ttk.Entry(form, textvariable=self.path_var, width=48)
-        self.path_entry.grid(row=3, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
-
-        self.args_label = ttk.Label(form, text="Arguments")
-        self.args_label.grid(row=4, column=0, sticky="w", pady=(0, 8))
-        self.args_entry = ttk.Entry(form, textvariable=self.args_var, width=48)
-        self.args_entry.grid(row=4, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        self.type_label.grid(row=5, column=0, sticky="w", pady=(0, 8))
+        self.type_combo = ttk.Combobox(form, textvariable=self.type_var, values=["python", "uvicorn (python)", "node", "executable"], state="readonly", width=46)
+        self.type_combo.grid(row=5, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
 
         self.working_label = ttk.Label(form, text="Working Directory")
-        self.working_label.grid(row=5, column=0, sticky="w", pady=(0, 8))
+        self.working_label.grid(row=6, column=0, sticky="w", pady=(0, 8))
         self.working_entry = ttk.Entry(form, textvariable=self.working_directory_var, width=48)
-        self.working_entry.grid(row=5, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        self.working_entry.grid(row=6, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
 
-        ttk.Label(form, text="Log Output").grid(row=6, column=0, sticky="w", pady=(0, 8))
-        ttk.Combobox(form, textvariable=self.output_mode_var, values=["file", "console", "both"], state="readonly", width=46).grid(row=6, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        self.venv_label = ttk.Label(form, text="Virtual Environment")
+        self.venv_label.grid(row=7, column=0, sticky="w", pady=(0, 8))
+        self.venv_entry = ttk.Entry(form, textvariable=self.virtual_environment_var, width=48)
+        self.venv_entry.grid(row=7, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
 
-        ttk.Label(form, text="Mode").grid(row=7, column=0, sticky="w", pady=(0, 8))
-        ttk.Combobox(form, textvariable=self.mode_var, values=["application", "service", "port"], state="readonly", width=46).grid(row=7, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        self.program_label = ttk.Label(form, text="Program/Script")
+        self.program_label.grid(row=8, column=0, sticky="w", pady=(0, 8))
+        self.program_entry = ttk.Entry(form, textvariable=self.program_var, width=48)
+        self.program_entry.grid(row=8, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
 
+        self.args_label = ttk.Label(form, text="Arguments")
+        self.args_label.grid(row=9, column=0, sticky="w", pady=(0, 8))
+        self.args_entry = ttk.Entry(form, textvariable=self.args_var, width=48)
+        self.args_entry.grid(row=9, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+
+        # mode = Service
         self.service_label = ttk.Label(form, text="Service Name")
-        self.service_label.grid(row=8, column=0, sticky="w", pady=(0, 8))
+        self.service_label.grid(row=10, column=0, sticky="w", pady=(0, 8))
         self.service_entry = ttk.Entry(form, textvariable=self.service_name_var, width=48)
-        self.service_entry.grid(row=8, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
-        self.test_service_button = ttk.Button(form, text="Test service connection", command=self._test_service_connection)
-        self.test_service_button.grid(row=8, column=2, sticky="w", padx=(8, 0), pady=(0, 8))
+        self.service_entry.grid(row=10, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        self.test_service_button = ttk.Button(form, text="Test", command=self._test_service_connection)
+        self.test_service_button.grid(row=10, column=2, sticky="w", padx=(8, 0), pady=(0, 8))
 
+        # mode = port
         self.port_host_label = ttk.Label(form, text="Port Host")
-        self.port_host_label.grid(row=9, column=0, sticky="w", pady=(0, 8))
+        self.port_host_label.grid(row=11, column=0, sticky="w", pady=(0, 8))
         self.port_host_entry = ttk.Entry(form, textvariable=self.port_host_var, width=48)
-        self.port_host_entry.grid(row=9, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        self.port_host_entry.grid(row=11, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
 
         self.port_number_label = ttk.Label(form, text="Port Number")
-        self.port_number_label.grid(row=10, column=0, sticky="w", pady=(0, 8))
+        self.port_number_label.grid(row=12, column=0, sticky="w", pady=(0, 8))
         self.port_number_entry = ttk.Entry(form, textvariable=self.port_number_var, width=48)
-        self.port_number_entry.grid(row=10, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
-        self.test_port_button = ttk.Button(form, text="Test port", command=self._test_port_connection)
-        self.test_port_button.grid(row=10, column=2, sticky="w", padx=(8, 0), pady=(0, 8))
+        self.port_number_entry.grid(row=12, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        self.test_port_button = ttk.Button(form, text="Test", command=self._test_port_connection)
+        self.test_port_button.grid(row=12, column=2, sticky="w", padx=(8, 0), pady=(0, 8))
 
-        ttk.Label(form, text="Card Size").grid(row=11, column=0, sticky="w", pady=(0, 8))
-        ttk.Combobox(form, textvariable=self.card_size_var, values=["1x1", "1x2", "1x3", "2x1", "2x2", "2x3", "3x1", "3x2", "3x3"], state="readonly", width=46).grid(row=11, column=1, sticky="ew", padx=(12, 0), pady=(0, 8))
+        ttk.Checkbutton(form, text="Enabled", variable=self.enabled_var).grid(row=13, column=1, sticky="w", padx=(12, 0), pady=(0, 12))
 
-        ttk.Checkbutton(form, text="Enabled", variable=self.enabled_var).grid(row=12, column=1, sticky="w", padx=(12, 0), pady=(0, 12))
-
-        self.application_fields = [self.type_label, self.type_combo, self.path_label, self.path_entry, self.args_label, self.args_entry, self.working_label, self.working_entry]
+        self.application_fields = [self.type_label, self.type_combo, self.program_label, self.program_entry, self.working_label, self.working_entry]
+        self.app_python_fields = [self.venv_label, self.venv_entry]
+        self.application_args_fields = [self.args_label, self.args_entry]
         self.service_fields = [self.service_label, self.service_entry, self.test_service_button]
         self.port_fields = [self.port_host_label, self.port_host_entry, self.port_number_label, self.port_number_entry, self.test_port_button]
         self.mode_var.trace_add("write", lambda *_: self._refresh_mode_fields())
+        self.type_var.trace_add("write", lambda *_: self._refresh_mode_fields())
         self._refresh_mode_fields()
 
         buttons = ttk.Frame(self)
@@ -107,12 +126,34 @@ class AppDialog(tk.Toplevel):
 
     def _refresh_mode_fields(self):
         mode = self.mode_var.get().lower()
+        selected_type = self.type_var.get().lower()
         is_application = mode == "application"
+        is_python_app = mode == "application" and selected_type in {"python", "uvicorn (python)"}
         is_service = mode == "service"
         is_port = mode == "port"
+        show_arguments = is_application and selected_type in {"python", "uvicorn (python)", "executable"}
+
+        program_label = "Program/script"
+        if selected_type == "executable":
+            program_label = "Program"
+        elif selected_type == "python" or selected_type == "uvicorn (python)":
+            program_label = "Script"
+        self.program_label.config(text=program_label)
 
         for widget in self.application_fields:
             if is_application:
+                widget.grid()
+            else:
+                widget.grid_remove()
+
+        for widget in self.app_python_fields:
+            if is_python_app:
+                widget.grid()
+            else:
+                widget.grid_remove()
+
+        for widget in self.application_args_fields:
+            if show_arguments:
                 widget.grid()
             else:
                 widget.grid_remove()
@@ -181,18 +222,19 @@ class AppDialog(tk.Toplevel):
         data = {
             "name": self.name_var.get().strip() or "New App",
             "description": self.description_var.get().strip(),
-            "type": self.type_var.get().lower(),
-            "path": self.path_var.get().strip(),
-            "args": args,
-            "working_directory": self.working_directory_var.get().strip(),
-            "enabled": self.enabled_var.get(),
-            "status": "stopped",
+            "card_size": self.card_size_var.get().lower(),
             "output_mode": self.output_mode_var.get().lower(),
+            "status": "stopped",
+            "enabled": self.enabled_var.get(),
             "mode": mode,
+            "type": self.type_var.get().lower(),
+            "working_directory": self.working_directory_var.get().strip(),
+            "venv": self.virtual_environment_var.get().strip(),
+            "program": self.program_var.get().strip(),
+            "args": args,
             "service_name": self.service_name_var.get().strip(),
             "port_host": self.port_host_var.get().strip() or "localhost",
             "port_number": port_number,
-            "card_size": self.card_size_var.get().lower(),
         }
         if self.original_app.get("id"):
             data["id"] = self.original_app["id"]

@@ -13,8 +13,8 @@ class ConfigStore:
             return Path(sys.executable).resolve().parent
         return Path(__file__).resolve().parents[1]
 
-    def __init__(self, path: str | Path | None = None):
-        base_path = Path(path) if path is not None else self._default_base_dir()
+    def __init__(self, program: str | Path | None = None):
+        base_path = Path(program) if program is not None else self._default_base_dir()
         self.path = base_path if base_path.suffix.lower() == ".json" else base_path / "app_launcher.json"
         self.path.parent.mkdir(parents=True, exist_ok=True)
         if not self.path.exists():

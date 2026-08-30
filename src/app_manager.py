@@ -7,7 +7,6 @@ from typing import Any
 from .config_store import ConfigStore
 from .process_manager import ProcessManager
 
-
 class AppManager:
     def __init__(self, config_path: str | None = None):
         self.config_store = ConfigStore(config_path)
@@ -19,6 +18,12 @@ class AppManager:
 
     def _save(self) -> None:
         self.config_store.save_apps(self.apps)
+
+    def _find_app(self, app_id: str) -> dict[str, Any]:
+        for app in self.apps:
+            if app.get("id") == app_id:
+                return app
+        raise ValueError(f"App with id '{app_id}' was not found.")
 
     def get_title(self) -> str:
         return str(self.title or "App Launcher").strip() or "App Launcher"
@@ -120,12 +125,6 @@ class AppManager:
         self._save()
         return app
 
-    def _find_app(self, app_id: str) -> dict[str, Any]:
-        for app in self.apps:
-            if app.get("id") == app_id:
-                return app
-        raise ValueError(f"App with id '{app_id}' was not found.")
-
     @staticmethod
     def build_app_id() -> str:
         return uuid.uuid4().hex[:8]
@@ -151,19 +150,20 @@ class AppManager:
             "id": app.get("id") or AppManager.build_app_id(),
             "name": str(app.get("name") or "New App"),
             "description": str(app.get("description") or ""),
-            "type": str(app.get("type") or "python").lower(),
-            "path": str(app.get("path") or ""),
-            "args": [str(arg) for arg in args],
-            "working_directory": str(app.get("working_directory") or ""),
-            "enabled": bool(app.get("enabled", True)),
-            "status": str(app.get("status") or "stopped"),
-            "pid": app.get("pid"),
+            "card_size": AppManager.normalize_card_size(app.get("card_size")),
             "output_mode": str(app.get("output_mode") or "both").lower(),
+            "status": str(app.get("status") or "stopped"),
+            "enabled": bool(app.get("enabled", True)),
             "mode": mode,
+            "type": str(app.get("type") or "python").lower(),
+            "working_directory": str(app.get("working_directory") or ""),
+            "venv": str(app.get("venv") or ""),
+            "program": str(app.get("program") or ""),
+            "args": [str(arg) for arg in args],
             "service_name": str(app.get("service_name") or "").strip(),
             "port_host": str(app.get("port_host") or "localhost").strip() or "localhost",
             "port_number": int(app.get("port_number") or 0) if str(app.get("port_number") or "0").strip().isdigit() else 0,
-            "card_size": AppManager.normalize_card_size(app.get("card_size")),
+            "pid": app.get("pid"),
             "last_log": app.get("last_log") or "",
         }
         return normalized
